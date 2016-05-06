@@ -1,5 +1,5 @@
 #!/bin/sh
-
+echo "BLA!"
 # SOURCE: https://github.com/purple52/librarian-puppet-vagrant
 
 # Directory in which librarian-puppet should manage its modules directory
