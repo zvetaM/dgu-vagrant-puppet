@@ -31,14 +31,14 @@ user { "co":
   gid        => "co",
   shell      => "/bin/bash",
   home       => "/home/co",
-  groups     => ["sudo","adm","www-data"],
+  groups     => ["wheel","adm","apache"],
 }
 
 file { '/etc/fqdn':
   content => $::fqdn
 }
 file { '/etc/motd':
-  content => "Welcome to your Puppet-built virtual machine!
+  content => "Hov hov hov!
               $motd\n"
 }
 file { '/home/co/.bashrc':
@@ -48,7 +48,7 @@ file { '/home/co/.bashrc':
 package { "screen":
   ensure => "installed"
 }
-package { "vim":
+package { "vim-enhanced":
   ensure => "installed"
 }
 package { "pv":
@@ -60,27 +60,51 @@ package { "unzip":
 package { "curl":
   ensure => "installed"
 }
+package { "wget":
+  ensure => "installed"
+}
+
+#NodeJS nadomestek: npm, nodejs
+#package { "nodejs":
+#  ensure => "installed"
+#}
+#package { "npm":
+#  ensure => "installed"
+#}
 
 # ---------
 # Drupal bits
 # ---------
-package { "mysql-server-5.5":
+#prej je bil mysql 5.5 server
+#package { "postgresql-server":
+#  ensure => "installed"
+#}
+
+#package { "php5-gd":
+#  ensure => "installed"
+#}
+
+package { "php-gd":
   ensure => "installed"
 }
-package { "php5-gd":
+
+package { "php-pgsql":
   ensure => "installed"
 }
-package { "php5-mysql":
+#package { "php-curl":
+#  ensure => "installed"
+#}
+package { "php-pear-Net-Curl":
   ensure => "installed"
 }
-package { "php5-curl":
+package { "php-common":
   ensure => "installed"
 }
 file {'/var/www/api_users':
   ensure => file,
   content => template('dgu_ckan/api_users.erb'),
   owner   => "co",
-  group   => "www-data",
+  group   => "apache",
 }
 
 include dgu_ckan

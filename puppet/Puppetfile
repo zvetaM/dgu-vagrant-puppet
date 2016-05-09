@@ -2,13 +2,13 @@
 # 
 forge "http://forge.puppetlabs.com"
 
-mod "puppetlabs/apt", '1.6.0'
+#mod "puppetlabs/apt", '1.6.0'
 mod "puppetlabs/concat", '1.1.1'
 mod "puppetlabs/stdlib", '4.3.2'
 mod "puppetlabs/apache", '1.1.1'
 
 mod "puppetlabs/postgresql", '4.0.0'
-mod "puppetlabs/nodejs", '0.6.1'
+#mod "puppetlabs/nodejs", '0.6.1'
 mod "saz/memcached", '2.5.0'
 mod "saz/sudo"
 mod "example42/puppi", '2.1.10'

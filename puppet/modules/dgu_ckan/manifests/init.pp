@@ -34,10 +34,12 @@ class dgu_ckan {
   }
 
   $python_requirements = [
-    'libxslt1-dev',
-    'libpq-dev',
+  #  'libxslt1-dev',
+    'libxslt-devel',
+  #  'libpq-dev',
+    'libpqxx-devel',
     'python-psycopg2',
-    'python-pastescript',
+    'python-paste-script',
   ]
   package { $python_requirements:
     ensure => installed,
@@ -204,14 +206,14 @@ class dgu_ckan {
   $ckan_log_file = "${ckan_log_root}/ckan.log"
   file {$ckan_log_file:
     ensure => file,
-    owner  => "www-data",
-    group  => "www-data",
+    owner  => "apache",
+    group  => "apache",
     mode   => 664,
   }
   file { [$ckan_log_root, $ckan_root, "${ckan_root}/data","${ckan_root}/sstore"]:
     ensure => directory,
-    owner  => "www-data",
-    group  => "www-data",
+    owner  => "apache",
+    group  => "apache",
     mode   => 664,
   }
   define ckan_config_file(
@@ -222,8 +224,8 @@ class dgu_ckan {
     file { $path :
       ensure  => file,
       content => template('dgu_ckan/ckan.ini.erb'),
-      owner   => "www-data",
-      group   => "www-data",
+      owner   => "apache",
+      group   => "apache",
       mode    => 664,
     }
   }
@@ -238,8 +240,8 @@ class dgu_ckan {
   file { $ckan_who_ini:
     ensure  => file,
     content => template('dgu_ckan/who.ini.erb'),
-    owner   => "www-data",
-    group   => "www-data",
+    owner   => "apache",
+    group   => "apache",
     mode    => 664,
   }
   notify {'ckan_fs_ready':
@@ -257,16 +259,23 @@ class dgu_ckan {
   # -----------
   # Postgres DB
   # -----------
+  package { "pgdg-centos92-9.2-2":
+      source => 'https://download.postgresql.org/pub/repos/yum/9.2/redhat/rhel-7-x86_64/pgdg-centos92-9.2-2.noarch.rpm',
+      ensure => present,
+  }
+
   $pg_superuser_pass = 'pass'
-  $postgis_version = "9.1"
+  #$postgis_version = "9.1" 
+  $postgis_version = "2.2"
 
   class { "postgresql::server":
     listen_addresses  => '*',
     postgres_password => $pg_superuser_pass,
   }
-  package {"postgresql-${postgis_version}-postgis":
+  #package {"postgresql-${postgis_version}-postgis":
+  package {"postgis2_92":
     ensure => present,
-    require => Class['postgresql::server'],
+    require => [ Class['postgresql::server'], Package['pgdg-centos92-9.2-2'] ],
   }
 
   postgresql::server::role { "co":
@@ -397,7 +406,8 @@ class dgu_ckan {
     user    => co,
     require => [
       File["/tmp/create_postgis_template.sh"],
-      Package["postgresql-${postgis_version}-postgis"],
+      #Package["postgresql-${postgis_version}-postgis"],
+      Package["postgis2_92"],
       Postgresql::Server::Role["co"],
     ]
   }
@@ -427,9 +437,14 @@ class dgu_ckan {
   file {['/etc/solr','/etc/solr/conf']:
     ensure => directory,
   }
-  package {'openjdk-7-jre-headless':
+  #package {'openjdk-7-jre-headless':
+  #  ensure => installed,
+  #}
+
+  package {'java-1.7.0-openjdk-headless':
     ensure => installed,
   }
+
   file {'/etc/init.d/jetty':
     ensure => file,
     mode   => 0755,
@@ -481,6 +496,7 @@ class dgu_ckan {
   service {"jetty":
     enable    => true,
     ensure    => running,
+    hasstatus => false,
     subscribe => [
       File["solr_schema_xml"],
       File["/etc/default/jetty"],
@@ -502,6 +518,19 @@ class dgu_ckan {
     default_vhost => false,
     mpm_module => 'prefork',
   }
+
+  file {'/etc/httpd/sites-enabled':
+    ensure   =>  directory,
+    owner    =>  apache,
+    group    =>  apache,
+  }
+
+  file {'/etc/httpd/sites-available':
+    ensure   =>  directory,
+    owner    =>  apache,
+    group    =>  apache,
+  }
+
   apache::mod {'wsgi':}
   apache::mod {'php5':}
   include ::apache::mod::rewrite
@@ -509,13 +538,14 @@ class dgu_ckan {
   apache::listen {'80':}
   file {[$ckan_apache_errorlog, $ckan_apache_customlog]:
     ensure => file,
-    owner  => 'www-data',
-    group  => 'www-data',
+    owner  => 'apache',
+    group  => 'apache',
     mode   => 664,
   }
   file {'apache_ckan_conf':
     ensure  => file,
-    path    => '/etc/apache2/sites-available/ckan.conf',
+  #  path    => '/etc/apache2/sites-available/ckan.conf',
+    path    => '/etc/httpd/sites-available/ckan.conf',
     content => template('dgu_ckan/apache-ckan.erb'),
     notify  => Exec['a2ensite ckan.conf'],
   }
@@ -536,7 +566,8 @@ class dgu_ckan {
       Service['jetty'],
       Notify['db_ready'],
     ],
-    command   => 'a2ensite ckan.conf && service apache2 reload',
+    #command   => 'a2ensite ckan.conf && service apache2 reload',
+    command   => 'ln -s /etc/httpd/sites-available/ckan.conf /etc/httpd/conf.d/ckan.conf && service httpd reload',
     path      => '/usr/bin:/bin:/usr/sbin',
     logoutput => 'on_failure',
   }
@@ -544,7 +575,23 @@ class dgu_ckan {
   # -----------
   # Redis
   # -----------
-  package {'redis-server':
+  
+  #package {'redis-server':
+  #  ensure => installed,
+  #}
+  #dgu_ckan::pip_package { 'redis==2.9.1':
+  #  require => Python::Virtualenv[$ckan_virtualenv],
+  #  ensure  => present,
+  #  owner   => 'co',
+  #  local   => false,
+  #}
+  #service { 'redis-server':
+  #  enable    => true,
+  #  ensure    => running,
+  #  require   => Package['redis-server'],
+  #}
+
+  package {'redis':
     ensure => installed,
   }
   dgu_ckan::pip_package { 'redis==2.9.1':
@@ -553,10 +600,10 @@ class dgu_ckan {
     owner   => 'co',
     local   => false,
   }
-  service { 'redis-server':
+  service { 'redis':
     enable    => true,
     ensure    => running,
-    require   => Package['redis-server'],
+    require   => Package['redis'],
   }
 
   # -----------
@@ -570,13 +617,22 @@ class dgu_ckan {
   # Shared assets
   # -----------
   # Setting manage_repo=true tells it to install nodejs from the chrislea PPA
-  class { 'nodejs':
-    manage_repo => true,
+  #class { 'nodejs':
+  #  manage_repo => false,
+  #}
+
+  package { "nodejs":
+    ensure => "installed",
   }
+  package { "npm":
+    ensure => "installed",
+  }
+  
   package { 'grunt-cli':
     ensure   => present,
     provider => 'npm',
-    require  => Class['nodejs'],
+    #require  => Class['nodejs'],
+    require => [Package['npm'], Package['nodejs']],
   }
   # Why use sudo here? There is some weird permissions thing running 'npm
   # install' in puppet as the root user that causes a permissions error:
