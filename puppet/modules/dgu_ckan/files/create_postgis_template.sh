@@ -3,24 +3,18 @@
 TMPL_NAME="template_postgis"
 
 # TODO: add support for multiple/non-default clusters
-PG_VERSION=$(pg_lsclusters --no-header | grep 5432 | awk '{ print $1 }')
+
+#To je le za Debian
+#PG_VERSION=$(pg_lsclusters --no-header | grep 5432 | awk '{ print $1 }')
+
+#To je pa za CentOS
+PG_VERSION=$(pg_config --version | awk '{ print $2 }' | head -c3) 
+#echo $PG_VERSION
 
 case "$PG_VERSION" in
-'8.3')
-PG_POSTGIS="/usr/share/postgresql-8.3-postgis/lwpostgis.sql"
-PG_SPATIAL_REF="/usr/share/postgresql-8.3-postgis/spatial_ref_sys.sql"
-;;
-'8.4')
-PG_POSTGIS="/usr/share/postgresql/8.4/contrib/postgis-1.5/postgis.sql"
-PG_SPATIAL_REF="/usr/share/postgresql/8.4/contrib/postgis-1.5/spatial_ref_sys.sql"
-;;
-'9.0')
-PG_POSTGIS="/usr/share/postgresql/9.0/contrib/postgis-1.5/postgis.sql"
-PG_SPATIAL_REF="/usr/share/postgresql/9.0/contrib/postgis-1.5/spatial_ref_sys.sql"
-;;
-'9.1')
-PG_POSTGIS="/usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql"
-PG_SPATIAL_REF="/usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql"
+'9.2')
+PG_POSTGIS="/usr/pgsql-9.2/share/contrib/postgis-2.1/postgis.sql"
+PG_SPATIAL_REF="/usr/pgsql-9.2/share/contrib/postgis-2.1/spatial_ref_sys.sql"
 ;;
 *)
 echo "No support for $PG_VERSION in $0"
