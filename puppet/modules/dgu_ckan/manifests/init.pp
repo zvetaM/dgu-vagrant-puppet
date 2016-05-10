@@ -259,10 +259,11 @@ class dgu_ckan {
   # -----------
   # Postgres DB
   # -----------
-  package { "pgdg-centos92-9.2-2":
-      source => 'https://download.postgresql.org/pub/repos/yum/9.2/redhat/rhel-7-x86_64/pgdg-centos92-9.2-2.noarch.rpm',
-      ensure => present,
-  }
+  ##Postgis sedaj zelim namestiti skupaj s postgresql modulom
+  ##package { "pgdg-centos92-9.2-2":
+  ##    source => 'https://download.postgresql.org/pub/repos/yum/9.2/redhat/rhel-7-x86_64/pgdg-centos92-9.2-2.noarch.rpm',
+  ##    ensure => present,
+  ##}
 
   $pg_superuser_pass = 'pass'
   #$postgis_version = "9.1" 
@@ -273,9 +274,12 @@ class dgu_ckan {
     postgres_password => $pg_superuser_pass,
   }
   #package {"postgresql-${postgis_version}-postgis":
-  package {"postgis2_92":
-    ensure => present,
-    require => [ Class['postgresql::server'], Package['pgdg-centos92-9.2-2'] ],
+  ##package {"postgis2_92":
+  ##  ensure => present,
+  ##  require => [ Class['postgresql::server'], Package['pgdg-centos92-9.2-2'] ],
+  ##}
+
+  class { "postgresql::server::postgis":
   }
 
   postgresql::server::role { "co":
@@ -407,7 +411,8 @@ class dgu_ckan {
     require => [
       File["/tmp/create_postgis_template.sh"],
       #Package["postgresql-${postgis_version}-postgis"],
-      Package["postgis2_92"],
+      #Package["postgis2_92"],
+      Class["postgresql::server::postgis"],
       Postgresql::Server::Role["co"],
     ]
   }
