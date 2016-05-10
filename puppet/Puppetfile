@@ -23,3 +23,5 @@ mod "datagovuk/python",
 
 mod "datagovuk/dgu_ckan",
    :path => "/vagrant/puppet/modules/dgu_ckan"
+
+mod "stahnma/epel"
