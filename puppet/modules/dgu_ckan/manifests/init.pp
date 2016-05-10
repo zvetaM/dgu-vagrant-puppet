@@ -622,22 +622,27 @@ class dgu_ckan {
   # Shared assets
   # -----------
   # Setting manage_repo=true tells it to install nodejs from the chrislea PPA
-  #class { 'nodejs':
-  #  manage_repo => false,
+  #class { 'nodejs': }
+
+  class { '::nodejs':
+    #nodejs_dev_package_ensure => 'present',
+    #npm_package_ensure => 'present',
+    repo_class => '::epel',
+  }
+
+  #package { "nodejs":
+  #  ensure => "installed",
   #}
 
-  package { "nodejs":
-    ensure => "installed",
-  }
-  package { "npm":
-    ensure => "installed",
-  }
+  #package { "npm":
+  #  ensure => "installed",
+  #}
   
   package { 'grunt-cli':
     ensure   => present,
     provider => 'npm',
-    #require  => Class['nodejs'],
-    require => [Package['npm'], Package['nodejs']],
+    require  => Class['nodejs'],
+    #require => [Package['npm'], Package['nodejs']],
   }
   # Why use sudo here? There is some weird permissions thing running 'npm
   # install' in puppet as the root user that causes a permissions error:
