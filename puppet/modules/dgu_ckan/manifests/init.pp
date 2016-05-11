@@ -267,18 +267,24 @@ class dgu_ckan {
 
   $pg_superuser_pass = 'pass'
   #$postgis_version = "9.1" 
-  $postgis_version = "2.2"
+  $postgre_version = "9.2"
 
+  #Zelim postgresql ter postgis iz uradnega repozitorija
+  class { 'postgresql::globals':
+    version             => $postgre_version,
+    manage_package_repo => true,
+  }->
   class { "postgresql::server":
     listen_addresses  => '*',
     postgres_password => $pg_superuser_pass,
   }
-  #package {"postgresql-${postgis_version}-postgis":
-  ##package {"postgis2_92":
+  #package {"postgresql-${postgis_version}-postgis": UBUNTU paket, bljak!
+  ##package {"postgis2_92": iz postgresql repozitorija, ne epel - tega ne zelis!
   ##  ensure => present,
   ##  require => [ Class['postgresql::server'], Package['pgdg-centos92-9.2-2'] ],
   ##}
 
+  #postgis tudi zelim imeti
   class { "postgresql::server::postgis":
   }
 
