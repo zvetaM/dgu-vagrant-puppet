@@ -259,35 +259,58 @@ class dgu_ckan {
   # -----------
   # Postgres DB
   # -----------
-  ##Postgis sedaj zelim namestiti skupaj s postgresql modulom
-  ##package { "pgdg-centos92-9.2-2":
-  ##    source => 'https://download.postgresql.org/pub/repos/yum/9.2/redhat/rhel-7-x86_64/pgdg-centos92-9.2-2.noarch.rpm',
-  ##    ensure => present,
-  ##}
-
   $pg_superuser_pass = 'pass'
   #$postgis_version = "9.1" 
   $postgre_version = "9.2"
 
-  #Zelim postgresql ter postgis iz uradnega repozitorija
-  class { 'postgresql::globals':
-    version             => $postgre_version,
-    manage_package_repo => true,
-  }->
-  class { "postgresql::server":
-    listen_addresses  => '*',
-    postgres_password => $pg_superuser_pass,
-  }
   #package {"postgresql-${postgis_version}-postgis": UBUNTU paket, bljak!
   ##package {"postgis2_92": iz postgresql repozitorija, ne epel - tega ne zelis!
   ##  ensure => present,
   ##  require => [ Class['postgresql::server'], Package['pgdg-centos92-9.2-2'] ],
   ##}
 
-  #postgis tudi zelim imeti
+  #+++++++++++++++++++++++++++++++++++ NACRT 74.2 +++++++++++++++++++++++++++++
+  #yumrepo { "pgdg92":
+  #  baseurl => "https://download.postgresql.org/pub/repos/yum/9.2/redhat/rhel-7-x86_64/",
+  #  descr => "Postgresql 9.2 uradni repo",
+  #  enabled => 1,
+  #  gpgcheck => 0,
+  #}
+  #package { "postgresql92-server" :
+  #  ensure => installed,
+  #  require => Yumrepo["pgdg92"],
+  #}
+  #
+  #package { "postgresql92-contrib" :
+  #  ensure => installed,
+  #  require => Yumrepo["pgdg92"],
+  #}
+  #
+  #package { "postgis2_92" :
+  #  ensure => installed,
+  #  require => Yumrepo["pgdg92"],
+  #}
+
+  #Manjka pretvorba ukazov iz ne74.2
+
+  #++++++++++++++++++++++++++++++++++++++ NACRT ne74.2 +++++++++++++++++++++++++
+  ##Nacrt ne74.2, na postgresql.org pise, da je vseeno
+  ##Zelim postgresql ter postgis iz uradnega repozitorija
+  class { 'postgresql::globals':
+    version             => $postgre_version,
+    manage_package_repo => true,
+    encoding => 'UTF8',
+    locale  => 'sl_SI.UTF-8',
+  }->
+  class { "postgresql::server":
+    listen_addresses  => '*',
+    postgres_password => $pg_superuser_pass,
+  }  
+  
+  ## postgis tudi zelim imeti
   class { "postgresql::server::postgis":
   }
-
+  
   postgresql::server::role { "co":
     password_hash => postgresql_password("co",$pg_superuser_pass),
     createdb      => true,
@@ -306,7 +329,7 @@ class dgu_ckan {
     login         => true,
     require       => Class["postgresql::server"],
   }
-
+  
   # if only puppetlabs/postgresql allowed me to specify a template...
   exec {"createdb ${ckan_db_name}":
     command   => "createdb -O ${ckan_db_user} ${ckan_db_name} --template template_postgis",
@@ -335,9 +358,56 @@ class dgu_ckan {
       Class["postgresql::server"],
     ],
   }
+  #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+  #****************************************************************
+  #Inicializacija Postgis razsiritev
+  #Glej: http://postgis.net/docs/manual-2.2/postgis_installation.html#idp66628704
+  exec {"postgis create EXTENSION postgis":
+    subscribe => [
+      Exec["createdb ${ckan_db_name}"],
+      File[$ckan_ini],
+    ],
+    command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis;\"",
+    path      => "/usr/bin:/bin:/usr/sbin",
+    user      => root,
+    logoutput => 'on_failure',
+    #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
+    #refreshonly => true,
+  }
+
+  exec {"postgis create EXTENSION postgis_topology":
+    subscribe => [
+      Exec["createdb ${ckan_db_name}"],
+      File[$ckan_ini],
+    ],
+    command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis_topology;\"",
+    path      => "/usr/bin:/bin:/usr/sbin",
+    user      => root,
+    logoutput => 'on_failure',
+    #refreshonly => true,
+  }
+
+  exec {"postgis run legacy.sql":
+    subscribe => [
+      Exec["createdb ${ckan_db_name}"],
+      File[$ckan_ini],
+    ],
+    command   => "sudo -u postgres psql -d $ckan_db_name -f /usr/pgsql-9.2/share/contrib/postgis-2.1/legacy.sql",
+    path      => "/usr/bin:/bin:/usr/sbin",
+    user      => root,
+    logoutput => 'on_failure',
+    #refreshonly => true
+  }
+  #****************************************************************
+
+ 
   exec {"paster db init":
     subscribe => [
       Exec["createdb ${ckan_db_name}"],
+      Exec["postgis create EXTENSION postgis"],
+      Exec["postgis create EXTENSION postgis_topology"],
+      Exec["postgis run legacy.sql"],
       File[$ckan_ini],
       Notify['virtualenv_ready'],
       Notify['ckan_fs_ready'],
