@@ -308,8 +308,8 @@ class dgu_ckan {
   }  
   
   ## postgis tudi zelim imeti - vendar iz epel direktorija!!!
-  #class { "postgresql::server::postgis":
-  #}
+  class { "postgresql::server::postgis":
+  }
   package { "postgis2_92" :
     ensure => installed,
     require => Class["postgresql::server"],
@@ -511,7 +511,7 @@ class dgu_ckan {
       File["/tmp/create_postgis_template.sh"],
       #Package["postgresql-${postgis_version}-postgis"],
       Package["postgis2_92"],
-      #Class["postgresql::server::postgis"],
+      Class["postgresql::server::postgis"],
       Postgresql::Server::Role["co"],
     ]
   }
