@@ -307,8 +307,12 @@ class dgu_ckan {
     postgres_password => $pg_superuser_pass,
   }  
   
-  ## postgis tudi zelim imeti
-  class { "postgresql::server::postgis":
+  ## postgis tudi zelim imeti - vendar iz epel direktorija!!!
+  #class { "postgresql::server::postgis":
+  #}
+  package { "postgis2_92" :
+    ensure => installed,
+    require => Class["postgresql::server"],
   }
   
   postgresql::server::role { "co":
@@ -506,8 +510,8 @@ class dgu_ckan {
     require => [
       File["/tmp/create_postgis_template.sh"],
       #Package["postgresql-${postgis_version}-postgis"],
-      #Package["postgis2_92"],
-      Class["postgresql::server::postgis"],
+      Package["postgis2_92"],
+      #Class["postgresql::server::postgis"],
       Postgresql::Server::Role["co"],
     ]
   }
