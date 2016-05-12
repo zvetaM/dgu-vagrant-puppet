@@ -371,6 +371,7 @@ class dgu_ckan {
     command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis;\"",
     path      => "/usr/bin:/bin:/usr/sbin",
     user      => root,
+    unless    => "sudo -u postgres psql -d ckan -c \"\\dx\" | grep postgis",
     logoutput => 'on_failure',
     #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
     #refreshonly => true,
@@ -384,20 +385,38 @@ class dgu_ckan {
     command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis_topology;\"",
     path      => "/usr/bin:/bin:/usr/sbin",
     user      => root,
+    unless    => "sudo -u postgres psql -d ckan -c \"\\dx\" | grep postgis_topology",
     logoutput => 'on_failure',
     #refreshonly => true,
   }
 
-  exec {"postgis run legacy.sql":
+  #Tega ne rabim
+  #exec {"postgis run legacy.sql":
+  #  subscribe => [
+  #    Exec["createdb ${ckan_db_name}"],
+  #    File[$ckan_ini],
+  #  ],
+  #  command   => "sudo -u postgres psql -d $ckan_db_name -f /usr/pgsql-9.2/share/contrib/postgis-2.1/legacy.sql",
+  #  path      => "/usr/bin:/bin:/usr/sbin",
+  #  user      => root,
+  #  logoutput => 'on_failure',
+  #  #refreshonly => true
+  #}
+
+  exec {"postgres alter spatial_ref_sys y geometry_columns table owner to dgu":
     subscribe => [
       Exec["createdb ${ckan_db_name}"],
+      Exec["postgis create EXTENSION postgis"],
+      Exec["postgis create EXTENSION postgis_topology"],
       File[$ckan_ini],
     ],
-    command   => "sudo -u postgres psql -d $ckan_db_name -f /usr/pgsql-9.2/share/contrib/postgis-2.1/legacy.sql",
+    command   => "sudo -u postgres psql -d ckan -c \"ALTER TABLE spatial_ref_sys OWNER TO dgu;ALTER TABLE geometry_columns OWNER TO dgu;\"",
     path      => "/usr/bin:/bin:/usr/sbin",
     user      => root,
     logoutput => 'on_failure',
-    #refreshonly => true
+    unless    => ["sudo -u postgres psql -d ckan -c \"\\d\" | grep spatial_ref_sys | grep dgu","sudo -u postgres psql -d ckan -c \"\\d\" | grep geometry_columns | grep dgu"],
+    #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
+    #refreshonly => true,
   }
   #****************************************************************
 
@@ -407,7 +426,7 @@ class dgu_ckan {
       Exec["createdb ${ckan_db_name}"],
       Exec["postgis create EXTENSION postgis"],
       Exec["postgis create EXTENSION postgis_topology"],
-      Exec["postgis run legacy.sql"],
+      Exec["postgres alter spatial_ref_sys y geometry_columns table owner to dgu"],
       File[$ckan_ini],
       Notify['virtualenv_ready'],
       Notify['ckan_fs_ready'],
