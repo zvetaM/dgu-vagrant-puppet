@@ -34,6 +34,8 @@ chown co /vagrant || echo "******NAPAKA*******: chown na /vagrant ni uspel"
 chgrp co /vagrant || echo "******NAPAKA*******: chgrp na /vagrant ni uspel"
 cd /vagrant || echo "******NAPAKA*******: cd na /vagrant ni uspel"
 sudo -u co git clone https://github.com/zvetaM/dgu-vagrant-puppet || echo "******NAPAKA*******: git clone zvetaM/dgu-vagrant-puppet ni uspel"
+cd dgu-vagrant-puppet || echo "******NAPAKA******: cd v dgu-vagrant-puppet ni uspel"
+sudo -u co git pull || echo "******NAPAKA*******: git pull zvetaM/dgu-vagrant-puppet ni uspel"
 cd /vagrant/dgu-vagrant-puppet || echo "******NAPAKA*******: cd v /vagrant/dgu-vagrant-puppet ni uspel"
 
 sudo -u co bash -c "ln -s /vagrant/dgu-vagrant-puppet/src /vagrant/src" || echo "******NAPAKA*******: ln /vagrant/src ni uspel"
