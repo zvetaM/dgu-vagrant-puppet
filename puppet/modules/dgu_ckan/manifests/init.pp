@@ -67,11 +67,8 @@ class dgu_ckan {
     'MarkupSafe==0.15',
     'OWSLib==0.8.2',
     'Pairtree==0.7.1-T',
-    'Paste==1.7.5.1',
     'PasteDeploy==1.5.0',
-    'PasteScript==1.7.5',
     'Pygments==1.6',
-    'Pylons==0.9.7',
     'PyMollom==0.1',
     'Routes==1.13',
     'SPARQLWrapper==1.6.4',
@@ -144,6 +141,25 @@ class dgu_ckan {
     owner      => 'co',
     local      => false,
   }
+  $pip_pkgs_remote_separate1 = [
+    'Paste==1.7.5.1',
+    'PasteScript==1.7.5'
+  ]
+  dgu_ckan::pip_package { $pip_pkgs_remote_separate1:
+    require => Dgu_ckan::Pip_package[$pip_pkgs_remote],
+    ensure     => present,
+    owner      => 'co',
+    local      => false,
+  }
+  $pip_pkgs_remote_separate2 = [
+    'Pylons==0.9.7'
+  ]
+  dgu_ckan::pip_package { $pip_pkgs_remote_separate2:
+    require => Dgu_ckan::Pip_package[$pip_pkgs_remote_separate1],
+    ensure     => present,
+    owner      => 'co',
+    local      => false,
+  }
   $pip_pkgs_local = [
     'ckan',
     'ckanext-dgu',
@@ -167,6 +183,8 @@ class dgu_ckan {
     require => [
         Python::Virtualenv[$ckan_virtualenv],
         Dgu_ckan::Pip_package[$pip_pkgs_remote],
+        Dgu_ckan::Pip_package[$pip_pkgs_remote_separate1],
+        Dgu_ckan::Pip_package[$pip_pkgs_remote_separate2]
     ],
     ensure  => present,
     owner   => 'co',
@@ -797,4 +815,3 @@ class dgu_ckan {
     mode   => 644,
   }
 }
-

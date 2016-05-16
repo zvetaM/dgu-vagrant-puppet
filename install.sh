@@ -52,11 +52,9 @@ sudo -u co ./git_clone_all.sh || echo "******NAPAKA*******: ./git_clone_all.sh n
 
 source /home/co/.rvm/scripts/rvm  || echo "******NAPAKA*******: source /home/co/.rvm/scripts/rvm ni uspel"
 /vagrant/puppet/install_puppet_dependancies.sh || echo "******NAPAKA*******: namestitev install_puppet_dependencies.sh ni uspela"
-#sudo -u co /home/co/ckan/bin/pip install --no-index --find-links=file:///vagrant/pypi PasteScript==1.7.5 || echo "******NAPAKA****** pip install PasteScript==1.7.5 ni uspel"
-#sudo -u co /home/co/ckan/bin/pip install --no-index --find-links=file:///vagrant/pypi Pylons==0.9.7 || echo "******NAPAKA****** pip install Pylons==0.9.7 ni uspel"
 source /home/co/.rvm/scripts/rvm ; puppet apply /vagrant/puppet/manifests/site.pp  || echo "******NAPAKA*******: puppet apply ni uspel"
 
-#sudo -u co /home/co/ckan/bin/paster --plugin=ckanext-dgu create-test-data --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan create-test-data ni uspel"
+sudo -u co /home/co/ckan/bin/paster --plugin=ckanext-dgu create-test-data --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan create-test-data ni uspel"
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan user add admin email=admin@ckan password=pass --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan user ni uspel"
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan sysadmin add admin --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan sysadmin ni uspel"
 
@@ -70,9 +68,6 @@ chown co:apache /var/www/drupal || echo "******NAPAKA****** sudo chown co:apache
 cd /src/dgu_d7/ || echo "******NAPAKA****** cd /src/dgu_d7/ ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush make distro.make /var/www/drupal/dgu" || echo "******NAPAKA****** drush make distro.make ni uspel"
 sudo -u postgres psql -U postgres -c "CREATE DATABASE dgu;" || echo "******NAPAKA****** postgres CREATE DATABASE dgu; ni uspel"
-#sudo su postgres
-#psql -U postgres -c "CREATE DATABASE dgu;"
-#exit
 yum install php-mbstring -y || echo "******NAPAKA****** yum install php-mbstring ni uspel"
 cd /var/www/drupal/dgu || echo "******NAPAKA****** cd /var/www/drupal/dgu ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes --verbose site-install dgu --db-url=pgsql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
@@ -83,10 +78,10 @@ sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ;
 
 chown -R co:apache /var/www/drupal/dgu/sites/default/files || echo "******NAPAKA****** sudo chown drupal default files ni uspel"
 
-#TODO: systemctl stop firewalld
+#odpre firewall za http(s) dostop
 firewall-cmd --permanent --zone=public --add-service=http || echo "******NAPAKA****** firewall add http ni uspel"
 firewall-cmd --permanent --zone=public --add-service=https || echo "******NAPAKA****** firewall add https ni uspel"
 firewall-cmd --reload || echo "******NAPAKA****** firewall reload ni uspel"
-#TODO: added "AddType application/x-httpd-php .php" to /etc/httpd/conf/httpd.conf
+#brez naslednjih vrstic apache ne dekodira php-ja
 echo "AddType application/x-httpd-php .php" > /etc/httpd/conf.d/php-enable.load || echo "******NAPAKA****** php enable ni uspel"
 service httpd restart || echo "******NAPAKA****** httpd restart ni uspel"
