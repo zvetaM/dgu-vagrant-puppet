@@ -80,6 +80,10 @@ package { "wget":
 #  ensure => "installed"
 #}
 
+package { "mysql-community-server":
+  ensure => "installed"
+}
+
 #package { "php5-gd":
 #  ensure => "installed"
 #}
@@ -88,9 +92,12 @@ package { "php-gd":
   ensure => "installed"
 }
 
-package { "php-pgsql":
+#if using postgres for Drupal, replace mysql with following:
+# package { "php-pgsql":
+package { "php-mysql":
   ensure => "installed"
 }
+
 #package { "php-curl":
 #  ensure => "installed"
 #}

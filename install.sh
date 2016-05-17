@@ -29,6 +29,13 @@ sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; gem install puppet -v 2.7
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; gem install highline -v 1.6.1" || echo "******NAPAKA*******: gem install highline ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; gem install librarian-puppet -v 1.0.3" || echo "******NAPAKA*******: gem install librarian-puppet ni uspel"
 
+#CentOS no longer has mysql in its official repo
+rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm || echo "******NAPAKA*******: mysql repo install ni uspel"
+#postgis causes trouble with double declarations in puppet, preinstall helps fix this
+rpm -Uvh http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-2.noarch.rpm || echo "******NAPAKA*******: postgis repo install ni uspel"
+yum update -y || echo "******NAPAKA*******: yum update ni uspel"
+yum install postgis2_92 -y || echo "******NAPAKA*******: install postgis ni uspel"
+
 mkdir /vagrant || echo "******NAPAKA*******: mkdir /vagrant ni uspel"
 chown co /vagrant || echo "******NAPAKA*******: chown na /vagrant ni uspel"
 chgrp co /vagrant || echo "******NAPAKA*******: chgrp na /vagrant ni uspel"
@@ -67,10 +74,17 @@ mkdir /var/www/drupal || echo "******NAPAKA****** sudo mkdir /var/www/drupal ni 
 chown co:apache /var/www/drupal || echo "******NAPAKA****** sudo chown co:apache /var/www/drupal ni uspel"
 cd /src/dgu_d7/ || echo "******NAPAKA****** cd /src/dgu_d7/ ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush make distro.make /var/www/drupal/dgu" || echo "******NAPAKA****** drush make distro.make ni uspel"
-sudo -u postgres psql -U postgres -c "CREATE DATABASE dgu;" || echo "******NAPAKA****** postgres CREATE DATABASE dgu; ni uspel"
+#za uporabo postgresa za Drupal zamenjaj mysql klice z naslednjim (beware: might cause errors running site because of incomplete support):	
+#sudo -u postgres psql -U postgres -c "CREATE DATABASE dgu;" || echo "******NAPAKA****** postgres CREATE DATABASE dgu; ni uspel"
+mysql -u root --execute "CREATE DATABASE dgu;"
+mysql -u root --execute "CREATE USER 'co'@'localhost' IDENTIFIED BY 'pass';"
+mysql -u root --execute "GRANT ALL PRIVILEGES ON *.* TO 'co'@'localhost';"
 yum install php-mbstring -y || echo "******NAPAKA****** yum install php-mbstring ni uspel"
 cd /var/www/drupal/dgu || echo "******NAPAKA****** cd /var/www/drupal/dgu ni uspel"
-sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes --verbose site-install dgu --db-url=pgsql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
+#postgres Drupal:
+#sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes --verbose site-install dgu --db-url=pgsql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
+#mysql Drupal:
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes --verbose site-install dgu --db-url=mysql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes en dgu_app dgu_blog dgu_consultation dgu_data_set dgu_data_set_request dgu_footer dgu_forum dgu_glossary dgu_idea dgu_library dgu_linked_data dgu_location dgu_moderation dgu_notifications dgu_organogram dgu_print dgu_reply dgu_search dgu_services dgu_user ckan" || echo "******NAPAKA****** drush module install ni uspel"
 
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush vset ckan_url 'http://data.gov.si/api/'" || echo "******NAPAKA****** drush vset ckan_url ni uspel"

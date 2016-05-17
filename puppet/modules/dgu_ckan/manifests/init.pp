@@ -328,10 +328,10 @@ class dgu_ckan {
   ## postgis tudi zelim imeti - vendar iz epel direktorija!!!
   class { "postgresql::server::postgis":
   }
-  package { "postgis2_92" :
-    ensure => installed,
-    require => Class["postgresql::server"],
-  }
+  #package { "postgis2_92" :
+  #  ensure => installed,
+  #  require => Class["postgresql::server"],
+  #}
   
   postgresql::server::role { "co":
     password_hash => postgresql_password("co",$pg_superuser_pass),
@@ -442,6 +442,19 @@ class dgu_ckan {
   }
   #****************************************************************
 
+  # -----------
+  # MySQL DB
+  # -----------
+  #****************************************************************
+  
+  exec {"start MySQL service":
+    command   => "systemctl start mysqld",
+    path      => "/usr/bin:/bin:/usr/sbin",
+    user      => root,
+    logoutput => 'on_failure'
+  }
+  
+  #****************************************************************
  
   exec {"paster db init":
     subscribe => [
