@@ -32,7 +32,7 @@ sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; gem install librarian-pup
 #CentOS no longer has mysql in its official repo
 rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm || echo "******NAPAKA*******: mysql repo install ni uspel"
 #postgis causes trouble with double declarations in puppet, preinstall helps fix this
-rpm -Uvh http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-2.noarch.rpm || echo "******NAPAKA*******: postgis repo install ni uspel"
+rpm -Uvh http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-6.noarch.rpm || echo "******NAPAKA*******: postgis repo install ni uspel"
 yum update -y || echo "******NAPAKA*******: yum update ni uspel"
 yum install postgis2_92 -y || echo "******NAPAKA*******: install postgis ni uspel"
 
