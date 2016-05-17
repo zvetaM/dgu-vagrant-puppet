@@ -460,7 +460,7 @@ class dgu_ckan {
   #****************************************************************
   
   exec {"start MySQL service":
-    command   => "sudo systemctl start mysqld",
+    command   => "systemctl start mysqld",
     path      => "/usr/bin:/bin:/usr/sbin",
     user      => root,
     logoutput => 'on_failure'
