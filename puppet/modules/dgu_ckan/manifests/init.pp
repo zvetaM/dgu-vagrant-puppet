@@ -541,7 +541,7 @@ class dgu_ckan {
     require => [
       File["/tmp/create_postgis_template.sh"],
       #Package["postgresql-${postgis_version}-postgis"],
-      Package["postgis2_92"],
+      #Package["postgis2_92"],
       Class["postgresql::server::postgis"],
       Postgresql::Server::Role["co"],
     ]
