@@ -440,21 +440,6 @@ class dgu_ckan {
     #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
     #refreshonly => true,
   }
-  #****************************************************************
-
-  # -----------
-  # MySQL DB
-  # -----------
-  #****************************************************************
-  
-  exec {"start MySQL service":
-    command   => "systemctl start mysqld",
-    path      => "/usr/bin:/bin:/usr/sbin",
-    user      => root,
-    logoutput => 'on_failure'
-  }
-  
-  #****************************************************************
  
   exec {"paster db init":
     subscribe => [

@@ -84,6 +84,25 @@ package { "mysql-community-server":
   ensure => "installed"
 }
 
+#****************************************************************
+
+# -----------
+# MySQL DB
+# -----------
+#****************************************************************
+
+exec {"start MySQL service":
+  require => [
+    Package['mysql-community-server']
+  ],
+  command   => "systemctl start mysqld",
+  path      => "/usr/bin:/bin:/usr/sbin",
+  user      => root,
+  logoutput => 'on_failure'
+}
+
+#****************************************************************
+
 #package { "php5-gd":
 #  ensure => "installed"
 #}
