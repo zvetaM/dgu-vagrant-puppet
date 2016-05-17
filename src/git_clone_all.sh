@@ -70,10 +70,10 @@ cd ckanext-report
 git checkout master
 cd -
 
-git clone	https://github.com/datagovuk/ckanext-spatial
-cd ckanext-spatial
-git checkout dgu
-cd -
+#git clone	https://github.com/datagovuk/ckanext-spatial
+#cd ckanext-spatial
+#git checkout dgu
+#cd -
 
 git clone	https://github.com/datagovuk/ckanext-taxonomy
 cd ckanext-taxonomy

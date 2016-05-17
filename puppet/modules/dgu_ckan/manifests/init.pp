@@ -165,7 +165,7 @@ class dgu_ckan {
     'ckanext-dgu',
     'ckanext-os',
     'ckanext-qa',
-    'ckanext-spatial',
+#    'ckanext-spatial', #TODO: replace with ckanext-geoview
     'ckanext-harvest',
     'ckanext-archiver',
     'ckanext-ga-report',
@@ -326,12 +326,12 @@ class dgu_ckan {
   }  
   
   ## postgis tudi zelim imeti - vendar iz epel direktorija!!!
-  class { "postgresql::server::postgis":
-  }
-  package { "postgis2_92" :
-    ensure => installed,
-    require => Class["postgresql::server"],
-  }
+  #class { "postgresql::server::postgis":
+  #}
+  #package { "postgis2_92.x86_64" :
+  #  ensure => installed,
+  #  require => Class["postgresql::server"],
+  #}
   
   postgresql::server::role { "co":
     password_hash => postgresql_password("co",$pg_superuser_pass),
@@ -354,13 +354,15 @@ class dgu_ckan {
   
   # if only puppetlabs/postgresql allowed me to specify a template...
   exec {"createdb ${ckan_db_name}":
-    command   => "createdb -O ${ckan_db_user} ${ckan_db_name} --template template_postgis",
+    #command   => "createdb -O ${ckan_db_user} ${ckan_db_name} --template template_postgis",
+    command   => "createdb -O ${ckan_db_user} ${ckan_db_name} --template template_utf8",
     unless    => "psql -l|grep '${ckan_db_name}\s'",
     path      => "/usr/bin:/bin",
     user      => postgres,
     logoutput => true,
     require   => [
-      Exec["createdb postgis_template"],
+      #Exec["createdb postgis_template"],
+      Exec["createdb utf8_template"],
       Postgresql::Server::Role[$ckan_db_user],
       Class["postgresql::server"],
     ],
@@ -385,32 +387,38 @@ class dgu_ckan {
   #****************************************************************
   #Inicializacija Postgis razsiritev
   #Glej: http://postgis.net/docs/manual-2.2/postgis_installation.html#idp66628704
-  exec {"postgis create EXTENSION postgis":
-    subscribe => [
-      Exec["createdb ${ckan_db_name}"],
-      File[$ckan_ini],
-    ],
-    command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis;\"",
-    path      => "/usr/bin:/bin:/usr/sbin",
-    user      => root,
-    unless    => "sudo -u postgres psql -d ckan -c \"\\dx\" | grep postgis",
-    logoutput => 'on_failure',
-    #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
-    #refreshonly => true,
-  }
+#  exec {"postgis create EXTENSION postgis":
+#    subscribe => [
+#      Exec["createdb ${ckan_db_name}"],
+#      File[$ckan_ini],
+#    ],
+#    require => [
+#      Package["postgis2_92.x86_64"]
+#    ],
+#    command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis;\"",
+#    path      => "/usr/bin:/bin:/usr/sbin",
+#    user      => root,
+#    unless    => "sudo -u postgres psql -d ckan -c \"\\dx\" | grep postgis",
+#    logoutput => 'on_failure',
+#    #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
+#    #refreshonly => true,
+#  }
 
-  exec {"postgis create EXTENSION postgis_topology":
-    subscribe => [
-      Exec["createdb ${ckan_db_name}"],
-      File[$ckan_ini],
-    ],
-    command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis_topology;\"",
-    path      => "/usr/bin:/bin:/usr/sbin",
-    user      => root,
-    unless    => "sudo -u postgres psql -d ckan -c \"\\dx\" | grep postgis_topology",
-    logoutput => 'on_failure',
-    #refreshonly => true,
-  }
+#  exec {"postgis create EXTENSION postgis_topology":
+#    subscribe => [
+#      Exec["createdb ${ckan_db_name}"],
+#      File[$ckan_ini],
+#    ],
+#    require => [
+#      Package["postgis2_92.x86_64"]
+#    ],
+#    command   => "sudo -u postgres psql -d $ckan_db_name -c \"CREATE EXTENSION postgis_topology;\"",
+#    path      => "/usr/bin:/bin:/usr/sbin",
+#    user      => root,
+#    unless    => "sudo -u postgres psql -d ckan -c \"\\dx\" | grep postgis_topology",
+#    logoutput => 'on_failure',
+#    #refreshonly => true,
+#  }
 
   #Tega ne rabim
   #exec {"postgis run legacy.sql":
@@ -425,30 +433,33 @@ class dgu_ckan {
   #  #refreshonly => true
   #}
 
-  exec {"postgres alter spatial_ref_sys y geometry_columns table owner to dgu":
-    subscribe => [
-      Exec["createdb ${ckan_db_name}"],
-      Exec["postgis create EXTENSION postgis"],
-      Exec["postgis create EXTENSION postgis_topology"],
-      File[$ckan_ini],
-    ],
-    command   => "sudo -u postgres psql -d ckan -c \"ALTER TABLE spatial_ref_sys OWNER TO dgu;ALTER TABLE geometry_columns OWNER TO dgu;\"",
-    path      => "/usr/bin:/bin:/usr/sbin",
-    user      => root,
-    logoutput => 'on_failure',
-    unless    => ["sudo -u postgres psql -d ckan -c \"\\d\" | grep spatial_ref_sys | grep dgu","sudo -u postgres psql -d ckan -c \"\\d\" | grep geometry_columns | grep dgu"],
-    #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
-    #refreshonly => true,
-  }
+#  exec {"postgres alter spatial_ref_sys y geometry_columns table owner to dgu":
+#    subscribe => [
+#      Exec["createdb ${ckan_db_name}"],
+#      Exec["postgis create EXTENSION postgis"],
+#      Exec["postgis create EXTENSION postgis_topology"],
+#      File[$ckan_ini],
+#    ],
+#    require => [
+#      Package["postgis2_92.x86_64"]
+#    ],
+#    command   => "sudo -u postgres psql -d ckan -c \"ALTER TABLE spatial_ref_sys OWNER TO dgu;ALTER TABLE geometry_columns OWNER TO dgu;\"",
+#    path      => "/usr/bin:/bin:/usr/sbin",
+#    user      => root,
+#    logoutput => 'on_failure',
+#    unless    => ["sudo -u postgres psql -d ckan -c \"\\d\" | grep spatial_ref_sys | grep dgu","sudo -u postgres psql -d ckan -c \"\\d\" | grep geometry_columns | grep dgu"],
+#    #refresh izvedi le na notify --> pozor, jaz imam subscribe, ne vem ce bo delovalo!
+#    #refreshonly => true,
+#  }
   #****************************************************************
 
  
   exec {"paster db init":
     subscribe => [
       Exec["createdb ${ckan_db_name}"],
-      Exec["postgis create EXTENSION postgis"],
-      Exec["postgis create EXTENSION postgis_topology"],
-      Exec["postgres alter spatial_ref_sys y geometry_columns table owner to dgu"],
+#      Exec["postgis create EXTENSION postgis"],
+#      Exec["postgis create EXTENSION postgis_topology"],
+#      Exec["postgres alter spatial_ref_sys y geometry_columns table owner to dgu"],
       File[$ckan_ini],
       Notify['virtualenv_ready'],
       Notify['ckan_fs_ready'],
@@ -510,29 +521,29 @@ class dgu_ckan {
     message   => "PostgreSQL database is ready.",
   }
   # Build template databases
-  file { "/tmp/create_postgis_template.sh":
-    ensure => file,
-    source => "puppet:///modules/dgu_ckan/create_postgis_template.sh",
-    mode   => 0755,
-  }
+#  file { "/tmp/create_postgis_template.sh":
+#    ensure => file,
+#    source => "puppet:///modules/dgu_ckan/create_postgis_template.sh",
+#    mode   => 0755,
+#  }
   file { "/tmp/create_utf8_template.sh":
     ensure => file,
     source => "puppet:///modules/dgu_ckan/create_utf8_template.sh",
     mode   => 0755,
   }
-  exec {"createdb postgis_template":
-    command => "/tmp/create_postgis_template.sh $ckan_test_db_user",
-    unless  => "psql -l |grep template_postgis",
-    path    => "/usr/bin:/bin",
-    user    => co,
-    require => [
-      File["/tmp/create_postgis_template.sh"],
-      #Package["postgresql-${postgis_version}-postgis"],
-      Package["postgis2_92"],
-      Class["postgresql::server::postgis"],
-      Postgresql::Server::Role["co"],
-    ]
-  }
+#  exec {"createdb postgis_template":
+#    command => "/tmp/create_postgis_template.sh $ckan_test_db_user",
+#    unless  => "psql -l |grep template_postgis",
+#    path    => "/usr/bin:/bin",
+#    user    => co,
+#    require => [
+#      File["/tmp/create_postgis_template.sh"],
+#      #Package["postgresql-${postgis_version}-postgis"],
+#      Package["postgis2_92.x86_64"],
+#      Class["postgresql::server::postgis"],
+#      Postgresql::Server::Role["co"],
+#    ]
+#  }
   exec {"createdb utf8_template":
     command => "/tmp/create_utf8_template.sh",
     unless  => "psql -l |grep template_utf8",

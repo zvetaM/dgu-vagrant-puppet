@@ -75,10 +75,11 @@ package { "wget":
 # ---------
 # Drupal bits
 # ---------
-#prej je bil mysql 5.5 server
-#package { "postgresql-server":
-#  ensure => "installed"
-#}
+#ideally we would use postgres server for Drupal, 
+#but until it works properly we use mysql in parallel
+package { "mysql-server-5.5":
+  ensure => "installed"
+}
 
 #package { "php5-gd":
 #  ensure => "installed"
@@ -88,7 +89,9 @@ package { "php-gd":
   ensure => "installed"
 }
 
-package { "php-pgsql":
+#if using postgres for Drupal, replace mysql with following:
+# package { "php-pgsql":
+package { "php-mysql":
   ensure => "installed"
 }
 #package { "php-curl":
