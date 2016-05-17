@@ -453,6 +453,20 @@ class dgu_ckan {
 #  }
   #****************************************************************
 
+  # -----------
+  # MySQL DB
+  # -----------
+  
+  #****************************************************************
+  
+  exec {"start MySQL service":
+    command   => "sudo systemctl start mysqld",
+    path      => "/usr/bin:/bin:/usr/sbin",
+    user      => root,
+    logoutput => 'on_failure'
+  }
+  
+  #****************************************************************
  
   exec {"paster db init":
     subscribe => [

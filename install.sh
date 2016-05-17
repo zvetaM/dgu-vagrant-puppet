@@ -22,6 +22,11 @@ cd /home/co || echo "******NAPAKA*******: cd v /home/co ni uspel"
 sudo -u co bash -c "gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3" || echo "******NAPAKA*******: dodajanje gpg2 ni uspelo"
 sudo -u co bash -c "curl -sSL get.rvm.io | bash -s stable" || echo "******NAPAKA*******: namestitev rvm ni uspela"
 sudo -u co bash -c "echo "source ~/.profile" >> /home/co/.bash_profile" || echo "******NAPAKA*******: spreminjanje .bash_profile ni uspelo"
+	
+yum install wget -y || echo "******NAPAKA*******: wget install ni uspel"
+wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm || echo "******NAPAKA*******: mysql repo download ni uspel"
+sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm || echo "******NAPAKA*******: mysql repo install ni uspel"
+yum update -y || echo "******NAPAKA*******: yum update ni uspel"
 
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; rvm requirements" || echo "******NAPAKA*******: rvm requirements ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; rvm install 1.8.7" || echo "******NAPAKA*******: rvm install 1.8.7 ni uspel"

@@ -77,7 +77,7 @@ package { "wget":
 # ---------
 #ideally we would use postgres server for Drupal, 
 #but until it works properly we use mysql in parallel
-package { "mysql-server-5.5":
+package { "mysql-server":
   ensure => "installed"
 }
 
