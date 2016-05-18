@@ -67,14 +67,13 @@ sudo -u co /home/co/ckan/bin/paster --plugin=ckan user add admin email=admin@cka
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan sysadmin add admin --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan sysadmin ni uspel"
 
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; curl -sS https://getcomposer.org/installer | php" || echo "******NAPAKA****** get composer ni uspel"
-mv composer.phar /usr/local/bin/composer || echo "******NAPAKA****** mv composer ni uspel"
+mv /vagrant/dgu-vagrant-puppet/src/composer.phar /usr/local/bin/composer || echo "******NAPAKA****** mv composer ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; /usr/local/bin/composer global require drush/drush" || echo "******NAPAKA****** composer global require ni uspel"
 echo 'export PATH="/home/co/.composer/vendor/bin:$PATH"' >> /home/co/.bashrc || echo "******NAPAKA****** sed composer ni uspel"
 source /home/co/.bashrc || echo "******NAPAKA****** source $HOME/.bashrc ni uspel"
 mkdir /var/www/drupal || echo "******NAPAKA****** sudo mkdir /var/www/drupal ni uspel"
 chown co:apache /var/www/drupal || echo "******NAPAKA****** sudo chown co:apache /var/www/drupal ni uspel"
-cd /src/dgu_d7/ || echo "******NAPAKA****** cd /src/dgu_d7/ ni uspel"
-sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush make distro.make /var/www/drupal/dgu" || echo "******NAPAKA****** drush make distro.make ni uspel"
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush make /src/dgu_d7/distro.make /var/www/drupal/dgu" || echo "******NAPAKA****** drush make distro.make ni uspel"
 #za uporabo postgresa za Drupal zamenjaj mysql klice z naslednjim (beware: might cause errors running site because of incomplete support):	
 #sudo -u postgres psql -U postgres -c "CREATE DATABASE dgu;" || echo "******NAPAKA****** postgres CREATE DATABASE dgu; ni uspel"
 mysql -u root --execute "CREATE DATABASE dgu;"
@@ -85,11 +84,19 @@ cd /var/www/drupal/dgu || echo "******NAPAKA****** cd /var/www/drupal/dgu ni usp
 #postgres Drupal:
 #sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes --verbose site-install dgu --db-url=pgsql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
 #mysql Drupal:
-sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes --verbose site-install dgu --db-url=mysql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
-sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush --yes en dgu_app dgu_blog dgu_consultation dgu_data_set dgu_data_set_request dgu_footer dgu_forum dgu_glossary dgu_idea dgu_library dgu_linked_data dgu_location dgu_moderation dgu_notifications dgu_organogram dgu_print dgu_reply dgu_search dgu_services dgu_user ckan" || echo "******NAPAKA****** drush module install ni uspel"
+#naslednji ukaz javi napako, zaenkrat jo ignoriramo:
+#WD cron: PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'dgu.ckan_dataset_history' doesn't exist: DELETE FROM                  [error]
+#{ckan_dataset_history} 
+#WHERE  (timestamp < :db_condition_placeholder_0) ; Array
+#(
+#    [:db_condition_placeholder_0] => 1460968899
+#)
+# in ckan_dataset_cron() (line 348 of /var/www/drupal/dgu/profiles/dgu/modules/contrib/ckan/ckan_dataset/ckan_dataset.module).
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; cd /var/www/drupal/dgu; drush --yes --verbose site-install dgu --db-url=mysql://co:pass@localhost/dgu --account-name=admin --account-pass=admin  --site-name='Portal odprtih podatkov Slovenije'" || echo "******NAPAKA****** drush site-install ni uspel"
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; cd /var/www/drupal/dgu; drush --yes en dgu_app dgu_blog dgu_consultation dgu_data_set dgu_data_set_request dgu_footer dgu_forum dgu_glossary dgu_idea dgu_library dgu_linked_data dgu_location dgu_moderation dgu_notifications dgu_organogram dgu_print dgu_reply dgu_search dgu_services dgu_user ckan" || echo "******NAPAKA****** drush module install ni uspel"
 
-sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush vset ckan_url 'http://data.gov.si/api/'" || echo "******NAPAKA****** drush vset ckan_url ni uspel"
-sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush vset ckan_apikey 'xxxxxxxxxxxxxxxxxxxxx'" || echo "******NAPAKA****** drush vset ckan_apikey ni uspel"
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; cd /var/www/drupal/dgu; drush vset ckan_url 'http://data.gov.si/api/'" || echo "******NAPAKA****** drush vset ckan_url ni uspel"
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; cd /var/www/drupal/dgu; drush vset ckan_apikey 'xxxxxxxxxxxxxxxxxxxxx'" || echo "******NAPAKA****** drush vset ckan_apikey ni uspel"
 
 chown -R co:apache /var/www/drupal/dgu/sites/default/files || echo "******NAPAKA****** sudo chown drupal default files ni uspel"
 
@@ -99,4 +106,14 @@ firewall-cmd --permanent --zone=public --add-service=https || echo "******NAPAKA
 firewall-cmd --reload || echo "******NAPAKA****** firewall reload ni uspel"
 #brez naslednjih vrstic apache ne dekodira php-ja
 echo "AddType application/x-httpd-php .php" > /etc/httpd/conf.d/php-enable.load || echo "******NAPAKA****** php enable ni uspel"
+
+cd /var/www/drupal/dgu
+drush composer-rebuild
+cd /var/www/drupal/dgu/sites/default/files/composer
+composer install
+
+sudo -u apache /home/co/ckan/bin/paster --plugin=ckan user add frontend email=a@b.com password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` --config=/var/ckan/ckan.ini
+sudo -u apache /home/co/ckan/bin/paster --plugin=ckan sysadmin add frontend --config=/var/ckan/ckan.ini
+
 service httpd restart || echo "******NAPAKA****** httpd restart ni uspel"
+

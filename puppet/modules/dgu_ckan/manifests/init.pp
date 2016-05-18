@@ -173,6 +173,7 @@ class dgu_ckan {
     'ckanext-datapreview',
     'ckanext-importlib',
     'ckanext-hierarchy',
+    'ckanext-packagezip',
     'ckanext-report',
     'ckanext-dgu-local',
     'ckanext-dcat',
