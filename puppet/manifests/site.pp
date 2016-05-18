@@ -80,6 +80,11 @@ package { "wget":
 #  ensure => "installed"
 #}
 
+#pip package psycopg2 seems to need this
+package { "postgresql-devel":
+  ensure => "installed"
+}
+
 package { "mysql-community-server":
   ensure => "installed"
 }
