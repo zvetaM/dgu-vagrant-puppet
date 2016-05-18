@@ -3,11 +3,12 @@
 # Exit if anything goes wrong
 set -e 
 
-sudo ln -fs /vagrant/etc/apache2/sites-available/drupal /etc/apache2/sites-available/
-sudo a2ensite drupal
+#http://serverfault.com/questions/472954/a2ensite-equivalent-in-centos
+#sudo ln -fs /etc/httpd/sites-available/drupal /etc/httpd/sites-available/
+#sudo a2ensite drupal
 
 # Download source code & drupal version
-DRUPAL_TARGET=/home/vagrant/drupal
+DRUPAL_TARGET=/var/www/drupal
 
 if [ -e $DRUPAL_TARGET ] ; then
   echo "Error: $DRUPAL_TARGET already exists." >&2
@@ -15,7 +16,7 @@ if [ -e $DRUPAL_TARGET ] ; then
 fi
 
 # Get rid of previous repo and build if exist
-drush make --working-copy --no-gitinfofile /vagrant/scripts/distro.make $DRUPAL_TARGET
+drush make --working-copy --no-gitinfofile /vagrant/dgu-vagrant-puppet/drupal/distro.make $DRUPAL_TARGET
 cd $DRUPAL_TARGET
 
 # Add Drupal6 files directory location (required for migration)
@@ -28,7 +29,7 @@ mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'co'@'localhost';" -u root -ppass
 mysql -e "GRANT DROP ON *.* TO 'co'@'localhost';" -u root -ppass
 
 # Install Drupal
-drush si dgu -y --site-name="data.gov.uk" --account-name=admin --account-pass=pass --db-url=mysql://co:pass@localhost/drupal;
+drush si dgu -y --site-name="data.gov.si" --account-name=admin --account-pass=pass --db-url=mysql://co:pass@localhost/drupal;
 
 # Add setting for Drupal6 production database dump (required for migration)
 chmod 644 $DRUPAL_TARGET/sites/default/settings.php
