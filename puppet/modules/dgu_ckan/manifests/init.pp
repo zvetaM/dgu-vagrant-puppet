@@ -229,7 +229,7 @@ class dgu_ckan {
     group  => "apache",
     mode   => 664,
   }
-  file { [$ckan_log_root, $ckan_root, "${ckan_root}/data","${ckan_root}/sstore,"${ckan_root}/filestore"]:
+  file { [$ckan_log_root, $ckan_root, "${ckan_root}/data","${ckan_root}/sstore","${ckan_root}/filestore"]:
     ensure => directory,
     owner  => "apache",
     group  => "apache",
@@ -268,6 +268,7 @@ class dgu_ckan {
       File[$ckan_log_file],
       File["${ckan_root}/data"],
       File["${ckan_root}/sstore"],
+      File["${ckan_root}/filestore"],
       File[$ckan_ini],
       File[$ckan_who_ini],
     ],
