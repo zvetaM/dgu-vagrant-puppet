@@ -96,6 +96,7 @@ package { "mysql-community-server":
 # -----------
 #****************************************************************
 
+#TODO: max_allowed_packet=16M should be set in /etc/my.cnf to avoid warnings in Drupal
 exec {"start MySQL service":
   require => [
     Package['mysql-community-server']

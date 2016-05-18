@@ -50,6 +50,7 @@ class dgu_ckan {
     version => 'system',
     owner => 'co',
     group => 'co',
+    mode => 755,
   }
 
   # Pip install everything
@@ -228,7 +229,7 @@ class dgu_ckan {
     group  => "apache",
     mode   => 664,
   }
-  file { [$ckan_log_root, $ckan_root, "${ckan_root}/data","${ckan_root}/sstore"]:
+  file { [$ckan_log_root, $ckan_root, "${ckan_root}/data","${ckan_root}/sstore,"${ckan_root}/filestore"]:
     ensure => directory,
     owner  => "apache",
     group  => "apache",

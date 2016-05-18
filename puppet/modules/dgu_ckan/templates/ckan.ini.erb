@@ -31,6 +31,7 @@ REDIS_CONNECT_RETRY = True
 [app:main]
 use = egg:ckan
 full_stack = true
+ckan.storage_path = <%= @ckan_root %>/filestore
 cache_dir = <%= @ckan_root %>/data
 beaker.session.key = ckan
 beaker.session.secret = ${app_instance_secret}
