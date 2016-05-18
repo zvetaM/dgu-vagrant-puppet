@@ -68,7 +68,7 @@ sudo -u co /home/co/ckan/bin/paster --plugin=ckan sysadmin add admin --config=/v
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; curl -sS https://getcomposer.org/installer | php" || echo "******NAPAKA****** get composer ni uspel"
 mv composer.phar /usr/local/bin/composer || echo "******NAPAKA****** mv composer ni uspel"
 sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; /usr/local/bin/composer global require drush/drush" || echo "******NAPAKA****** composer global require ni uspel"
-sudo -u co sed -i '$a\export PATH="/home/co/.composer/vendor/bin:$PATH"' /home/co/.bashrc || echo "******NAPAKA****** sed composer ni uspel"
+echo 'export PATH="/home/co/.composer/vendor/bin:$PATH"' >> /home/co/.bashrc || echo "******NAPAKA****** sed composer ni uspel"
 source /home/co/.bashrc || echo "******NAPAKA****** source $HOME/.bashrc ni uspel"
 mkdir /var/www/drupal || echo "******NAPAKA****** sudo mkdir /var/www/drupal ni uspel"
 chown co:apache /var/www/drupal || echo "******NAPAKA****** sudo chown co:apache /var/www/drupal ni uspel"
