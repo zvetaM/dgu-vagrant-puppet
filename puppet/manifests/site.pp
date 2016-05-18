@@ -43,7 +43,7 @@ file { '/etc/motd':
 }
 file { '/home/co/.bashrc':
    ensure => 'link',
-   target => '/vagrant/.bashrc',
+   target => '/vagrant/dgu-vagrant-puppet/.bashrc',
 }
 package { "screen":
   ensure => "installed"
