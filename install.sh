@@ -19,6 +19,8 @@ sed -i 's/enforcing/permissive/g' /etc/selinux/config /etc/selinux/config || ech
 setenforce 0 || echo "******NAPAKA*******: setenforce 0 ne deluje"
 
 yum install -y firewalld
+systemctl enable firewalld
+systemctl start firewalld
 
 cd /home/co || echo "******NAPAKA*******: cd v /home/co ni uspel"
 
