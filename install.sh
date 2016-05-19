@@ -18,6 +18,8 @@ sed -e '/Defaults[[:space:]]\+requiretty/ s/^#*/#/' -i /etc/sudoers || echo "***
 sed -i 's/enforcing/permissive/g' /etc/selinux/config /etc/selinux/config || echo "******NAPAKA*******: SELinux nisem mogel spremeniti načina delovanja na permissive iz enforcing"
 setenforce 0 || echo "******NAPAKA*******: setenforce 0 ne deluje"
 
+yum install -y firewalld
+
 cd /home/co || echo "******NAPAKA*******: cd v /home/co ni uspel"
 
 sudo -u co bash -c "gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3" || echo "******NAPAKA*******: dodajanje gpg2 ni uspelo"
@@ -108,9 +110,9 @@ firewall-cmd --reload || echo "******NAPAKA****** firewall reload ni uspel"
 echo "AddType application/x-httpd-php .php" > /etc/httpd/conf.d/php-enable.load || echo "******NAPAKA****** php enable ni uspel"
 
 cd /var/www/drupal/dgu
-drush composer-rebuild
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; drush composer-rebuild"
 cd /var/www/drupal/dgu/sites/default/files/composer
-composer install
+sudo -u co bash -c "source /home/co/.rvm/scripts/rvm ; source /home/co/.bashrc ; composer install"
 
 sudo -u apache /home/co/ckan/bin/paster --plugin=ckan user add frontend email=a@b.com password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` --config=/var/ckan/ckan.ini
 sudo -u apache /home/co/ckan/bin/paster --plugin=ckan sysadmin add frontend --config=/var/ckan/ckan.ini
