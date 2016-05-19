@@ -1,4 +1,4 @@
-echo "Skripta za namestitev data.gov.si (različica 11.5.2016-3)"
+echo "Skripta za namestitev data.gov.si (različica 18.5.2016-3)"
 
 #Kot uporabnik root, namestitev na novo virtualko
 if [ "$EUID" -ne 0 ]
@@ -116,10 +116,10 @@ echo "AddType application/x-httpd-php .php" > /etc/httpd/conf.d/php-enable.load 
 cd /var/www/drupal/dgu || echo "******NAPAKA****** cd v /var/www/drupal/dgu ni uspel"
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu ; drush composer-rebuild" || echo "******NAPAKA****** drush composer-rebuild ni uspel"
 cd /var/www/drupal/dgu/sites/default/files/composer || echo "******NAPAKA****** cd v /var/www/drupal/dgu/sites/default/files/composer ni uspel"
-sudo -u co bash -c "source /home/co/.bash_profile ; cd cd /var/www/drupal/dgu/sites/default/files/composer ; composer install" || echo "******NAPAKA****** composer install ni uspel"
+sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu/sites/default/files/composer ; composer install" || echo "******NAPAKA****** composer install ni uspel"
 
-sudo -u apache -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan user add frontend email=a@b.com password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` --config=/var/ckan/ckan.ini" || echo "******NAPAKA****** ckan user add frontend ni uspel"
-sudo -u apache -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan sysadmin add frontend --config=/var/ckan/ckan.ini" || echo "******NAPAKA****** ckan sysadmin add frontend ni uspel"
+sudo -u apache bash -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan user add frontend email=a@b.com password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` --config=/var/ckan/ckan.ini" || echo "******NAPAKA****** ckan user add frontend ni uspel"
+sudo -u apache bash -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan sysadmin add frontend --config=/var/ckan/ckan.ini" || echo "******NAPAKA****** ckan sysadmin add frontend ni uspel"
 
 service httpd restart || echo "******NAPAKA****** httpd restart ni uspel"
 
