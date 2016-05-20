@@ -125,7 +125,6 @@ class dgu_ckan {
     'repoze.who-friendlyform==1.0.8',
     'repoze.who.plugins.openid==0.5.3',
     'requests==1.1',
-    'simplejson==3.2.0',
     'six==1.9.0',
     'solrpy==0.9.5',
     'sqlalchemy-migrate==0.7.2',
