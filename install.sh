@@ -70,6 +70,7 @@ sudo -u co /home/co/ckan/bin/paster --plugin=ckanext-dgu create-test-data --conf
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan user add admin email=admin@ckan password=pass --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan user ni uspel"
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan sysadmin add admin --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan sysadmin ni uspel"
 
+sudo -u co /home/co/ckan/bin/pip install simplejson==3.2.0
 
 echo 'export PATH="/usr/local/bin:$PATH"' >> /home/co/.bashrc || echo "******NAPAKA****** razsirjen PATHH z /usr/local/bin ni uspel"
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /src ; curl -sS https://getcomposer.org/installer | php" || echo "******NAPAKA****** get composer ni uspel"
