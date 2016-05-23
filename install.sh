@@ -67,10 +67,10 @@ source /home/co/.rvm/scripts/rvm  || echo "******NAPAKA*******: source /home/co/
 source /home/co/.rvm/scripts/rvm ; puppet apply /vagrant/puppet/manifests/site.pp  || echo "******NAPAKA*******: puppet apply ni uspel"
 
 sudo -u co /home/co/ckan/bin/paster --plugin=ckanext-dgu create-test-data --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan create-test-data ni uspel"
+sudo -u co /home/co/ckan/bin/paster --plugin=ckanext-dgu schema init --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan schema init ni uspel"
+sudo -u co /home/co/ckan/bin/paster --plugin=ckanext-packagezip packagezip init --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan packagezip init ni uspel"
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan user add admin email=admin@ckan password=pass --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan user ni uspel"
 sudo -u co /home/co/ckan/bin/paster --plugin=ckan sysadmin add admin --config=/var/ckan/ckan.ini || echo "******NAPAKA****** paster ckan sysadmin ni uspel"
-
-sudo -u co /home/co/ckan/bin/pip install simplejson==3.2.0
 
 echo 'export PATH="/usr/local/bin:$PATH"' >> /home/co/.bashrc || echo "******NAPAKA****** razsirjen PATHH z /usr/local/bin ni uspel"
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /src ; curl -sS https://getcomposer.org/installer | php" || echo "******NAPAKA****** get composer ni uspel"
@@ -114,9 +114,7 @@ firewall-cmd --reload || echo "******NAPAKA****** firewall reload ni uspel"
 #brez naslednjih vrstic apache ne dekodira php-ja
 echo "AddType application/x-httpd-php .php" > /etc/httpd/conf.d/php-enable.load || echo "******NAPAKA****** php enable ni uspel"
 
-cd /var/www/drupal/dgu || echo "******NAPAKA****** cd v /var/www/drupal/dgu ni uspel"
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu ; drush composer-rebuild" || echo "******NAPAKA****** drush composer-rebuild ni uspel"
-cd /var/www/drupal/dgu/sites/default/files/composer || echo "******NAPAKA****** cd v /var/www/drupal/dgu/sites/default/files/composer ni uspel"
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu/sites/default/files/composer ; composer install" || echo "******NAPAKA****** composer install ni uspel"
 
 sudo -u apache bash -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan user add frontend email=a@b.com password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` --config=/var/ckan/ckan.ini" &> /tmp/frontend_izhod.txt || echo "******NAPAKA****** ckan user add frontend ni uspel"
