@@ -16,7 +16,7 @@ if [ -e $DRUPAL_TARGET ] ; then
 fi
 
 # Get rid of previous repo and build if exist
-drush make --working-copy --no-gitinfofile /vagrant/dgu-vagrant-puppet/drupal/distro.make $DRUPAL_TARGET
+drush make --working-copy --no-core --no-gitinfofile /vagrant/dgu-vagrant-puppet/drupal/distro.make $DRUPAL_TARGET
 cd $DRUPAL_TARGET
 
 # Add Drupal6 files directory location (required for migration)
