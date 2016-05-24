@@ -4,7 +4,7 @@ projects[drupal][version] = 7.21
 
 projects[dgu][type] = "profile"
 projects[dgu][download][type] = "git"
-projects[dgu][download][url] = "https://github.com/datagovuk/dgu_d7.git"
+projects[dgu][download][url] = "https://github.com/zvetaM/dgu_d7.git"
 
 ; download missing d3.js and d3.min.js files
 ; TODO: move to dgu_d7 make after forking it
