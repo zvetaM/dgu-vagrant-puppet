@@ -29,7 +29,7 @@ cd ckanext-dcat
 git checkout dgu
 cd -
 
-git clone	https://github.com/datagovuk/ckanext-dgu
+git clone	https://github.com/zvetaM/ckanext-dgu
 cd ckanext-dgu
 git checkout master
 ln -s ../commit-msg.githook ./.git/hooks/commit-msg
@@ -100,7 +100,7 @@ cd logreporter
 git checkout master
 cd -
 
-git clone   https://github.com/datagovuk/dgu_d7
+git clone   https://github.com/zvetaM/dgu_d7
 cd dgu_d7
 git checkout master
 cd -
