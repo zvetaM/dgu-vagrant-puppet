@@ -1,5 +1,7 @@
 #Pozeni me kot root
 #Posodobijo se dgu_d7, ckanext-dgu ter shared_dguk_assets
+#Te skripte se ne sme uporabljati, ker uporablja bazo "dgu"
+exit 1
 
 cd /src
 cd ckanext-dgu
