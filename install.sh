@@ -119,7 +119,7 @@ sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu/sites
 
 sudo -u apache bash -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan user add frontend email=a@b.com password=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1` --config=/var/ckan/ckan.ini" &> /tmp/frontend_izhod.txt || echo "******NAPAKA****** ckan user add frontend ni uspel"
 APIKEY=$(cat /tmp/frontend_izhod.txt | grep apikey | awk '{print $2}' | sed -r 's/^.{2}//' | sed 's/.\{2\}$//')
-sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu ; drush vset ckan_apikey '$APIKEY'" || echo "******NAPAKA****** drush vset ckan_apikey ni uspel"
+[[ !  -z  $APIKEY  ]] && sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu ; drush vset ckan_apikey '$APIKEY'" || echo "******NAPAKA****** drush vset ckan_apikey ni uspel oziroma je kljuc ze nastavljen!"
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu ; drush vset d3_library_source cdn" || echo "******NAPAKA****** drush vset d3_library_source ni uspel"
 sudo -u apache bash -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan sysadmin add frontend --config=/var/ckan/ckan.ini" || echo "******NAPAKA****** ckan sysadmin add frontend ni uspel"
 
