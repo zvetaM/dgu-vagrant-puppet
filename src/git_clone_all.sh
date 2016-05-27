@@ -47,7 +47,8 @@ cd -
 
 git clone	https://github.com/datagovuk/ckanext-harvest
 cd ckanext-harvest
-git checkout 2.0
+#from branch 2.0
+git checkout 76fbab04badc0bc0d38338012259cdd11ee28abe
 cd -
 
 git clone	https://github.com/datagovuk/ckanext-hierarchy
@@ -77,7 +78,8 @@ cd -
 
 git clone	https://github.com/datagovuk/ckanext-spatial
 cd ckanext-spatial
-git checkout dgu
+#on dgu branch
+git checkout 70e272db1851f3b11116f6d1c4bf3375aaa16c93 .
 cd -
 
 git clone	https://github.com/datagovuk/ckanext-taxonomy

@@ -85,10 +85,10 @@ class dgu_ckan {
     'anyjson==0.3.3',
     'apachemiddleware==0.1.1',
     'autoneg==0.5',
-    'carrot==0.10.1',
+#    'carrot==0.10.1',
     'celery==2.4.2',
     'chardet==2.1.1',
-    'ckanclient==0.10',
+#    'ckanclient==0.10',
     'datautil==0.4',
     'decorator==3.3.2',
     'factory-boy==2.1.1',
@@ -109,6 +109,7 @@ class dgu_ckan {
     'nose==1.3.0',
     'ofs==0.4.1',
     'passlib==1.6.2',
+    'pika==0.9.8',
     'openpyxl==1.5.7',
     'psycopg2==2.4.5',
     'pylibmc',
@@ -716,7 +717,7 @@ class dgu_ckan {
   package {'redis':
     ensure => installed,
   }
-  dgu_ckan::pip_package { 'redis==2.9.1':
+  dgu_ckan::pip_package { 'redis==2.10.1':
     require => Python::Virtualenv[$ckan_virtualenv],
     ensure  => present,
     owner   => 'co',
