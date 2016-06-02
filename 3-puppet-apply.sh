@@ -15,7 +15,7 @@ trap 'abort' 0
 #exit script on error
 set -e
 #log stdout and stderr to log as well as stdout
-exec &> >(tee -a "log-3-puppet.txt")
+exec &> >(tee -a "log-3-puppet-apply.txt")
 #exec 1>log.txt 2>&1
 
 #Run as root when installing on fresh machine

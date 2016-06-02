@@ -18,7 +18,7 @@ set -e
 exec &> >(tee -a "log-2-conf-user.txt")
 #exec 1>log.txt 2>&1
 
-#Run as root when installing on fresh machine
+#Run as co when installing on fresh machine
 if [ "$(whoami)" != "co" ]
   then echo "Run script as 'co' user, by calling sudo -u co bash 2-configure-user-env.sh"
   echo "If getting premission denied, you need to run it inside a directory where co has execute permissions."
