@@ -147,9 +147,6 @@ APIKEY=$(cat /tmp/frontend_izhod.txt | grep apikey | awk '{print $2}' | sed -r '
 sudo -u co bash -c "source /home/co/.bash_profile ; cd /var/www/drupal/dgu ; drush vset d3_library_source cdn" || ( echo "******ERROR****** drush vset d3_library_source ni uspel" && false )
 sudo -u apache bash -c "source /home/co/.bash_profile; /home/co/ckan/bin/paster --plugin=ckan sysadmin add frontend --config=/var/ckan/ckan.ini" || ( echo "******ERROR****** ckan sysadmin add frontend ni uspel" && false )
 
-sudo -u co bash -c "source /home/co/.bash_profile; cd /var/www/drupal/dgu/sites/all/libraries/ && wget https://developer.jasig.org/cas-clients/php/1.3.4/CAS-1.3.4.tgz && tar -xvf CAS-1.3.4.tgz && mv CAS-1.3.4 CAS" || ( echo "******ERROR****** downloading CAS library failed" && false )
-
-sudo -u co bash -c "source /home/co/.bash_profile; cd /var/www/drupal/dgu/; drush -y en cas_varnostna_shema" || ( echo "******ERROR****** enabling varnostna shema module failed" && false )
 
 sudo -u co bash <<EOF || ( echo "******ERROR****** creating roles failed" && false )
 source /home/co/.bash_profile
@@ -162,36 +159,8 @@ drush role-create "Tehnični urednik"
 drush role-create "Sistemski administrator"
 EOF
 
-sudo -u co bash <<EOF || ( echo "******ERROR****** setting CAS variables failed" && false )
-source /home/co/.bash_profile
-cd /var/www/drupal/dgu/
-# cas
-drush ev 'variable_set("cas_hide_email", 1);'
-drush ev 'variable_set("cas_hide_password", 1);'
-drush ev 'variable_set("cas_login_form", "2");'
-drush ev 'variable_set("cas_server", "vs-test.gov.si");'
-drush ev 'variable_set("cas_uri", "/VS.web/");'
-drush ev 'variable_set("cas_user_register", 1);'
-drush ev 'variable_set("cas_version", "2.0");'
-# cas attributes
-drush ev 'variable_set("cas_attributes_overwrite", "1");'
-drush ev 'variable_set("cas_attributes_sync_every_login", "1");'
-drush ev 'variable_set("cas_attributes_roles_mapping", "roles");'
-drush ev 'variable_set("cas_attributes_relations", array(
-  "name" => "[cas:varnostna_shema:taxid]",
-  "mail" => "[cas:varnostna_shema:email]",
-  "field_first_name" => "[cas:varnostna_shema:firstname]",
-  "field_surname" => "[cas:varnostna_shema:lastname]"));'
-drush ev 'variable_set("cas_attributes_roles_manage", array(
-        array_search("Glavni urednik", user_roles()),
-        array_search("Področni urednik", user_roles()),
-        array_search("Vsebinski urednik", user_roles()),
-        array_search("Tehnični urednik", user_roles()),
-        array_search("Sistemski administrator", user_roles())
-    ));'
-# cas varnostna shema
-drush ev 'variable_set("cas_attributes_varnostna_shema_cert_location", "/var/www/drupal/dgu/CertKey.pem");'
-EOF
+sudo -u co bash -c "source /home/co/.bash_profile; cd /var/www/drupal/dgu/; drush -y en cas_varnostna_shema" || ( echo "******ERROR****** enabling varnostna shema module failed" && false )
+
 
 service httpd restart || ( echo "******ERROR****** httpd restart ni uspel" && false )
 
